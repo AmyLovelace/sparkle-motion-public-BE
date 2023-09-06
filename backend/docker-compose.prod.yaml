@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+  frontend:
+    image: sparklemotion-frontend-prod:latest
+    container_name: sparklemotion-frontend-prod
+    ports:
+      - "80:80"
+    networks:
+      - sparklemotion-network-prod
+
+  backend:
+    image: sparklemotion-backend-prod:latest
+    container_name: sparklemotion-backend-prod
+    ports:
+      - "8082:8080"
+    depends_on:
+      - database
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/${POSTGRES_DB}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+    networks:
+      - sparklemotion-network-prod
+
+  database:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - sparklemotion-network-prod
+
+networks:
+  sparklemotion-network-prod:
+    driver: bridge
+
